@@ -39,6 +39,48 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-    // Implementation missing.
-}
 
+    //determine instructiontype
+    DMux(sel=instruction[15], in=true, a=aInstruction, b=cInstruction);
+
+
+    //Do ALU computation
+    //choose A or M
+    Mux16(sel=instruction[12], a=outA, b=inM, out=yALU);
+    //actually compute with ALU
+    ALU(x=outD, y=yALU, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8], f=instruction[7], no=instruction[6], out=outALU);
+    
+    //compute jump conditions
+    Or16Way(in=outALU, out=NE);
+    Not(in=NE, out=EQ);
+    FirstBit16(in=outALU, out=LT);
+    Not(in=LT, out=GE);
+    And(a=NE, b=GE, out=GT);
+    Not(in=GT, out=LE);
+
+    //compute whether to jump
+    Mux8Way(sel=instruction[0..2], a=false, b=GT, c=EQ, d=GE, e=LT, f=NE, g=LE, h=true, out=jump);
+    //only actually do the jump if it's a C instruction
+    And(a=cInstruction, b=jump, out=doJump);    
+    Not(in=doJump, out=doInc);
+
+    //decide whether to load registers
+    And(a=instruction[3], b=cInstruction, out=writeM, out=tWriteM);
+    And(a=instruction[4], b=cInstruction, out=loadD);
+    And(a=instruction[5], b=cInstruction, out=cLoadA);
+
+    //write to memory if need be
+    Mux16(sel=tWriteM, a=inM, b=outALU, out=outM);
+
+    //Detrmine what to load A with
+    Mux16(sel=cInstruction, a=instruction, b=outALU, out=inA);
+    Or(a=aInstruction, b=cLoadA, out=loadA);
+
+    //registers
+    ARegister(in=inA, load=loadA, out=outA, out[0..14]=addressM);
+    DRegister(in=outALU, load=loadD, out=outD);
+    
+    
+    PC(in=outA, load=doJump, inc=doInc, reset=reset, out[0..14]=pc);
+    
+}

@@ -1,0 +1,36 @@
+// This file is part of the materials accompanying the book 
+// "The Elements of Computing Systems" by Nisan and Schocken, 
+// MIT Press. Book site: www.idc.ac.il/tecs
+// File name: projects/01/Mux8Way16.hdl
+
+/**
+ * 8-way 16-bit multiplexor.  
+ * out = a -- if sel=000
+ *       b -- if sel=001
+ *       c -- if sel=010
+ *       d -- if sel=011
+ *       e -- if sel=100
+ *       f -- if sel=101
+ *       g -- if sel=110
+ *       h -- if sel=111
+ */
+ 
+CHIP Mux8Way {
+
+    IN  a, b, c, d,
+        e, f, g, h,
+        sel[3];
+
+    OUT out;
+
+    PARTS: 
+    Mux(a=a, b=b, sel=sel[0], out=aorb);
+    Mux(a=c, b=d, sel=sel[0], out=cord);
+    Mux(a=e, b=f, sel=sel[0], out=eorf);
+    Mux(a=g, b=h, sel=sel[0], out=gorh);
+    
+    Mux(a=aorb, b=cord, sel=sel[1], out=aborcd);
+    Mux(a=eorf, b=gorh, sel=sel[1], out=eforgh);
+    
+    Mux(a=aborcd, b=eforgh, sel=sel[2], out=out);
+}

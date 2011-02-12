@@ -1,0 +1,12 @@
+/**
+ * Return the upper pin or the input
+ */
+
+CHIP FirstBit16 {
+     
+     IN in[16];
+     OUT out;
+     
+     PARTS:
+     Mux(sel=in[15], a=false, b=true, out=out);
+}
