@@ -1,0 +1,21 @@
+// This file is part of the materials accompanying the book 
+// "The Elements of Computing Systems" by Nisan and Schocken, 
+// MIT Press. Book site: www.idc.ac.il/tecs
+// File name: projects/01/Mux16.hdl
+
+/**
+ * 16-bit multiplexor. If sel=0 then out = a else out = b.
+ */
+
+CHIP Mux16 {
+
+    IN  a[16], b[16], sel;
+    OUT out[16];
+
+    PARTS:
+    And16(a=sel, b=b, out=bselected);
+    Not16(in=sel, out=notsel);
+    And16(a=a, b=notsel, out=aselected);
+    Or16(a=aselected, b=bselected, out=out);
+    
+}
