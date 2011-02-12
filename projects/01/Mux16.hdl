@@ -13,8 +13,8 @@ CHIP Mux16 {
     OUT out[16];
 
     PARTS:
-    And16(a=sel, b=b, out=bselected);
-    Not16(in=sel, out=notsel);
+    And16(a[0]=sel, a[1]=sel, a[2]=sel, a[3]=sel, a[4]=sel, a[5]=sel, a[6]=sel, a[7]=sel, a[8]=sel, a[9]=sel, a[10]=sel, a[11]=sel, a[12]=sel, a[13]=sel, a[14]=sel, a[15]=sel, b=b, out=bselected);
+    Not16(in[0]=sel, in[1]=sel, in[2]=sel, in[3]=sel, in[4]=sel, in[5]=sel, in[6]=sel, in[7]=sel, in[8]=sel, in[9]=sel, in[10]=sel, in[11]=sel, in[12]=sel, in[13]=sel, in[14]=sel, in[15]=sel, out=notsel);
     And16(a=a, b=notsel, out=aselected);
     Or16(a=aselected, b=bselected, out=out);
 }
