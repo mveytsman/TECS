@@ -22,7 +22,7 @@
  */
 
 CHIP ALU {
-
+// Implementation missing.]
     IN  // 16-bit inputs:
         x[16], y[16],
         // Control bits:
@@ -36,10 +36,34 @@ CHIP ALU {
     OUT // 16-bit output
         out[16],
 
-        // ALU output flags
+        // ALU output flags	
         zr, // 1 if out=0, 0 otherwise
         ng; // 1 if out<0, 0 otherwise
 
     PARTS:
-    // Implementation missing.
+
+    //xfinal is x after being zeroed and negated if flags are set
+    Mux16(sel=zx, a=x, b[0..15]=false, out=xtemp);
+    Not16(in=xtemp, out=notxtemp);
+    Mux16(sel=nx, a=xtemp, b=notxtemp, out=xfinal);
+
+    //yfinal is y after being zeroes and negated if flags are set
+    Mux16(sel=zy, a=y, b[0..15]=false, out=ytemp);
+    Not16(in=ytemp, out=notytemp);
+    Mux16(sel=ny, a=ytemp, b=notytemp, out=yfinal);
+
+    And16(a=xfinal, b=yfinal, out=andxy);
+    Add16(a=xfinal, b=yfinal, out=addxy);
+    
+    //choose opperation
+    Mux16(sel=f, a=andxy, b=addxy, out=result);
+    
+    //do not if needed
+    Not16(in=result, out=notresult);
+    Mux16(sel=no, a=result, b=notresult, out=tempout, out=out, out[15]=ng);
+    
+
+    //compute zr
+    Or16Way(in=tempout, out=notzr);
+    Not(in=notzr, out=zr);
 }
